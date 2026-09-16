@@ -157,18 +157,14 @@ export function TableScreen({
           ← Sair
         </button>
         <div className="flex items-center gap-2">
-          <span className="display rounded-full border-2 border-ink bg-paper px-3 py-1 text-xs text-ink">
-            {room.code}
-          </span>
-          <span className="display rounded-full border-2 border-ink bg-ink px-3 py-1 text-xs text-sun">
-            {remaining} no monte
-          </span>
-          <span
-            className="display rounded-full border-2 border-ink bg-grape px-3 py-1 text-xs text-cream"
-            title={`Quem tem a bola responde em ${stealWindow}s antes de liberar o roubo`}
-          >
-            {modeLabel} · {stealWindow}s
-          </span>
+          {room.mode === "LIGHTNING" ? (
+            <span
+              className="display rounded-full border-2 border-ink bg-grape px-3 py-1 text-xs text-cream"
+              title={`Quem tem a bola responde em ${stealWindow}s antes de liberar o roubo`}
+            >
+              {modeLabel} · {stealWindow}s
+            </span>
+          ) : null}
           <button
             type="button"
             onClick={onRules}
@@ -202,7 +198,7 @@ export function TableScreen({
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="display text-lg text-ink">Placar</h2>
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink/45">
-            alvo: {room.target_cards} cartas
+            Alvo {room.target_cards} · {remaining} no monte
           </span>
         </div>
 

@@ -6,6 +6,7 @@ import { useDraggable } from "@/hooks/useDraggable";
 import { useRecorder } from "@/hooks/useRecorder";
 import { api } from "@/lib/api";
 import { maxAudioSeconds, maxMessageLength } from "@/lib/game/chat";
+import { countUnread, unreadLabel } from "@/lib/game/unread";
 import type { ChatMessage } from "@/types/room";
 
 interface ChatBubbleProps {
@@ -27,7 +28,7 @@ export function ChatBubble({ code, token, myId }: ChatBubbleProps) {
   const [sending, setSending] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
   const [showEmojis, setShowEmojis] = useState(false);
-  const [seenCount, setSeenCount] = useState(0);
+  const [seenId, setSeenId] = useState<string | null>(null);
 
   const feed = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -117,11 +118,13 @@ export function ChatBubble({ code, token, myId }: ChatBubbleProps) {
 
   const busyWithAudio = recorder.stage !== "IDLE";
 
+  const lastId = messages.length > 0 ? messages[messages.length - 1].id : null;
+
   const minimize = useCallback(() => {
-    setSeenCount(messages.length);
+    setSeenId(lastId);
     setShowEmojis(false);
     setOpen(false);
-  }, [messages.length]);
+  }, [lastId]);
 
   useEffect(() => {
     if (!open || busyWithAudio) {
@@ -147,7 +150,7 @@ export function ChatBubble({ code, token, myId }: ChatBubbleProps) {
     return () => window.clearTimeout(timer);
   }, [open, showEmojis, settle]);
 
-  const unread = open ? 0 : Math.max(0, messages.length - seenCount);
+  const unread = open ? 0 : countUnread(messages, seenId, myId);
 
   if (!open) {
     return (
@@ -160,7 +163,7 @@ export function ChatBubble({ code, token, myId }: ChatBubbleProps) {
             return;
           }
 
-          setSeenCount(messages.length);
+          setSeenId(lastId);
           setOpen(true);
         }}
         aria-label="Abrir o chat da mesa. Arraste para mudar de lugar"
@@ -170,8 +173,8 @@ export function ChatBubble({ code, token, myId }: ChatBubbleProps) {
       >
         💬
         {unread > 0 ? (
-          <span className="display absolute -right-2 -top-2 flex h-7 min-w-7 items-center justify-center rounded-full border-3 border-ink bg-magenta px-1 text-xs text-cream">
-            {unread > 9 ? "9+" : unread}
+          <span className="display animate-pop-in absolute -right-2 -top-2 flex h-7 min-w-[1.75rem] items-center justify-center rounded-full border-[3px] border-ink bg-magenta px-1 text-xs text-cream">
+            {unreadLabel(unread)}
           </span>
         ) : null}
       </button>
