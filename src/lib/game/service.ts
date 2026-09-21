@@ -255,6 +255,7 @@ export async function createRoom(input: {
   deck: DeckKind;
   difficulty?: Difficulty;
   mode?: GameMode;
+  isTest?: boolean;
 }) {
   const client = serverClient();
   const { data: code, error: codeError } = await client.rpc("vt_generate_code");
@@ -276,6 +277,7 @@ export async function createRoom(input: {
       seed_cards: preset.seedCards,
       target_cards: preset.targetCards,
       token_cost: preset.tokenCost,
+      is_test: input.isTest ?? false,
     })
     .select()
     .single();
@@ -1376,6 +1378,16 @@ export async function saveMatch(
   winnerId: string | null,
 ): Promise<void> {
   const client = serverClient();
+  const { data: roomRow } = await client
+    .from("vt_rooms")
+    .select("is_test")
+    .eq("id", roomId)
+    .maybeSingle();
+
+  if ((roomRow as { is_test: boolean } | null)?.is_test) {
+    return;
+  }
+
   const { data } = await client
     .from("vt_players")
     .select("id, name, timeline_count")

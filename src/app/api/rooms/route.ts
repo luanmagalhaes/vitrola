@@ -1,5 +1,6 @@
 import { handle } from "@/app/api/_shared";
 import { createRoom } from "@/lib/game/service";
+import { looksLikeRobot } from "@/lib/game/testDetection";
 import type { Difficulty } from "@/lib/game/seeds";
 import type { DeckKind } from "@/types/track";
 
@@ -17,6 +18,12 @@ export async function POST(request: Request) {
 
     const mode = modes.includes(body.mode) ? (body.mode as (typeof modes)[number]) : "CLASSIC";
 
-    return createRoom({ hostName: String(body.hostName ?? ""), deck, difficulty, mode });
+    return createRoom({
+      hostName: String(body.hostName ?? ""),
+      deck,
+      difficulty,
+      mode,
+      isTest: looksLikeRobot(request),
+    });
   });
 }
