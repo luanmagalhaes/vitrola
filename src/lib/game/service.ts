@@ -604,6 +604,18 @@ async function finishByPileOut(roomId: string): Promise<never> {
       .eq("id", roomId)
       .is("winner_player_id", null);
 
+    const { data: finishedRoom } = await client
+      .from("vt_rooms")
+      .select("code")
+      .eq("id", roomId)
+      .maybeSingle();
+
+    await saveMatch(
+      roomId,
+      (finishedRoom as { code: string } | null)?.code ?? "",
+      leader.id,
+    );
+
     await wipeChat(roomId);
 
     await record({
@@ -832,6 +844,8 @@ export async function submitGuess(input: {
         steal_count: 0,
       })
       .eq("id", room.id);
+
+    await saveMatch(room.id, room.code, winner.id);
 
     await record({
       roomId: room.id,
@@ -1354,4 +1368,33 @@ export async function loadRoomForChat(code: string, token: string) {
   const player = await loadPlayer(room, token);
 
   return { room, player };
+}
+
+export async function saveMatch(
+  roomId: string,
+  roomCode: string,
+  winnerId: string | null,
+): Promise<void> {
+  const client = serverClient();
+  const { data } = await client
+    .from("vt_players")
+    .select("id, name, timeline_count")
+    .eq("room_id", roomId)
+    .order("timeline_count", { ascending: false });
+
+  const people = (data ?? []) as Array<{
+    id: string;
+    name: string;
+    timeline_count: number;
+  }>;
+
+  await client.from("vt_matches").insert({
+    room_code: roomCode,
+    winner_name: people.find((person) => person.id === winnerId)?.name ?? null,
+    rounds: people.reduce((total, person) => total + person.timeline_count, 0),
+    players: people.map((person) => ({
+      name: person.name,
+      score: person.timeline_count,
+    })),
+  });
 }

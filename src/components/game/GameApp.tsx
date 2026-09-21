@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import { AudioDeck } from "@/components/game/AudioDeck";
 import { ChatBubble } from "@/components/game/ChatBubble";
 import { HomeScreen } from "@/components/game/HomeScreen";
+import { HistoryScreen } from "@/components/history/HistoryScreen";
 import { HowToPlay } from "@/components/game/HowToPlay";
 import { NoticeModal } from "@/components/game/NoticeModal";
 import { ResultModal } from "@/components/game/ResultModal";
@@ -37,7 +38,7 @@ import {
 } from "@/lib/prefs";
 import type { RoomRow } from "@/types/room";
 
-type View = "HOME" | "CREATE" | "JOIN";
+type View = "HOME" | "CREATE" | "JOIN" | "HISTORY";
 
 const previewAttempts = 4;
 
@@ -279,6 +280,10 @@ export function GameApp() {
     });
 
   if (!session) {
+    if (view === "HISTORY") {
+      return <HistoryScreen onBack={() => setView("HOME")} />;
+    }
+
     if (view === "CREATE" || view === "JOIN") {
       return (
         <>
@@ -337,6 +342,7 @@ export function GameApp() {
           onCreate={() => setView("CREATE")}
           onJoin={() => setView("JOIN")}
           onRules={() => setAskedRules(true)}
+          onHistory={() => setView("HISTORY")}
         />
       </>
     );

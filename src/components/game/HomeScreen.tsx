@@ -12,6 +12,7 @@ interface HomeScreenProps {
   onForget: (code: string) => void;
   onCreate: () => void;
   onRules: () => void;
+  onHistory: () => void;
   onJoin: () => void;
 }
 
@@ -21,6 +22,7 @@ export function HomeScreen({
   onForget,
   onCreate,
   onRules,
+  onHistory,
   onJoin,
 }: HomeScreenProps) {
   const lastSeat = seats[0];
@@ -51,13 +53,22 @@ export function HomeScreen({
               </div>
             ) : null}
 
-            <button
-              type="button"
-              onClick={onRules}
-              className="display cursor-pointer rounded-xl px-3 py-1.5 text-sm text-ink/60 transition-colors hover:text-ink"
-            >
-              Como se joga?
-            </button>
+            <div className="flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={onRules}
+                className="display cursor-pointer rounded-xl px-3 py-1.5 text-sm text-ink/60 transition-colors hover:text-ink"
+              >
+                Como se joga?
+              </button>
+              <button
+                type="button"
+                onClick={onHistory}
+                className="display cursor-pointer rounded-xl px-3 py-1.5 text-sm text-ink/60 transition-colors hover:text-ink"
+              >
+                Histórico
+              </button>
+            </div>
             <Button variant="ink" size="lg" fullWidth onClick={onCreate}>
               {copy.home.createRoom}
             </Button>
