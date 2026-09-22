@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { AvatarPicker } from "@/components/game/AvatarPicker";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { cards } from "@/utils/plural";
@@ -13,6 +15,10 @@ import type { PlayerRow, RoomRow } from "@/types/room";
 interface LobbyScreenProps {
   room: RoomRow;
   players: PlayerRow[];
+  code: string;
+  token: string;
+  meId: string | null;
+  onRefresh: () => void;
   isHost: boolean;
   canAnyoneStart: boolean;
   graceLeft: number;
@@ -26,6 +32,10 @@ interface LobbyScreenProps {
 export function LobbyScreen({
   room,
   players,
+  code,
+  token,
+  meId,
+  onRefresh,
   isHost,
   canAnyoneStart,
   graceLeft,
@@ -35,6 +45,7 @@ export function LobbyScreen({
   onLeave,
   onSetup,
 }: LobbyScreenProps) {
+  const me = players.find((player) => player.id === meId) ?? null;
   const [copied, setCopied] = useState(false);
   const [confirmingStart, setConfirmingStart] = useState(false);
   const enough = players.length >= 2;
@@ -159,6 +170,10 @@ export function LobbyScreen({
             <span className="text-sm font-semibold text-ink/55">{players.length} de 10</span>
           </div>
 
+          {me ? (
+            <AvatarPicker code={code} token={token} me={me} onDone={onRefresh} />
+          ) : null}
+
           <ul className="flex flex-col gap-2">
             {players.map((player, index) => (
               <li
@@ -166,9 +181,12 @@ export function LobbyScreen({
                 className="animate-sleeve-slide flex items-center gap-3 rounded-2xl border-2 border-ink bg-paper p-3"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <span className="display flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink text-sun">
-                  {player.seat}
-                </span>
+                <Avatar
+                  name={player.name}
+                  photo={player.avatar}
+                  emoji={player.emoji}
+                  size="sm"
+                />
                 <span className="display min-w-0 flex-1 truncate text-ink">{player.name}</span>
                 {player.is_host ? (
                   <span className="display rounded-full bg-magenta px-2.5 py-1 text-[0.6rem] text-cream">

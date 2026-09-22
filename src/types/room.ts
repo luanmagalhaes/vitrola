@@ -79,6 +79,8 @@ export interface PlayerRow {
   is_turntable: boolean;
   tokens: number;
   timeline_count: number;
+  avatar: string | null;
+  emoji: string | null;
 }
 
 export interface TimelineCardRow {

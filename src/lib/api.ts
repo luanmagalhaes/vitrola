@@ -89,6 +89,35 @@ export const api = {
       token,
     ),
 
+  setEmoji: (code: string, token: string, emoji: string) =>
+    request<{ emoji: string }>(
+      `/api/rooms/${code}/profile`,
+      { method: "POST", body: JSON.stringify({ emoji }) },
+      token,
+    ),
+
+  setPhoto: async (code: string, token: string, blob: Blob) => {
+    const response = await fetch(`/api/rooms/${code}/avatar`, {
+      method: "POST",
+      body: blob,
+      headers: { "Content-Type": blob.type, "x-player-token": token },
+    }).catch(() => null);
+
+    if (!response) {
+      throw new ApiError("Não consegui enviar a foto. Veja sua conexão.");
+    }
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new ApiError(
+        (payload as { error?: string } | null)?.error ?? messageForStatus(response.status),
+      );
+    }
+
+    return payload as { avatar: string };
+  },
+
   chat: (code: string, token: string) =>
     request<{ messages: ChatMessage[] }>(`/api/rooms/${code}/chat`, { method: "GET" }, token),
 

@@ -378,6 +378,10 @@ export function GameApp() {
         <LobbyScreen
           room={state.room}
           players={state.players}
+          code={session.code}
+          token={session.accessToken}
+          meId={state.meId}
+          onRefresh={() => void refresh()}
           isHost={me?.is_host ?? false}
           canAnyoneStart={lobbyGraceLeft <= 0}
           graceLeft={lobbyGraceLeft}

@@ -11,6 +11,7 @@ import {
   labelForSlot,
   nextSeat,
 } from "@/lib/game/timeline";
+import { randomFace } from "@/data/faces";
 import { serverClient } from "@/lib/supabase/server";
 import { shuffle } from "@/utils/shuffle";
 import { capitalize } from "@/utils/text";
@@ -297,6 +298,17 @@ export async function createRoom(input: {
   return joined;
 }
 
+async function facesTaken(roomId: string): Promise<string[]> {
+  const { data } = await serverClient()
+    .from("vt_players")
+    .select("emoji")
+    .eq("room_id", roomId);
+
+  return ((data ?? []) as { emoji: string | null }[])
+    .map((row) => row.emoji)
+    .filter((emoji): emoji is string => Boolean(emoji));
+}
+
 export async function joinRoom(input: { code: string; name: string; isHost?: boolean }) {
   const client = serverClient();
   const room = await loadRoom(input.code);
@@ -320,6 +332,7 @@ export async function joinRoom(input: { code: string; name: string; isHost?: boo
       seat,
       is_host: input.isHost ?? false,
       is_turntable: input.isHost ?? false,
+      emoji: randomFace(await facesTaken(room.id)),
     })
     .select()
     .single();
