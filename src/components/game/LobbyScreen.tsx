@@ -9,7 +9,7 @@ import { cards } from "@/utils/plural";
 import { RoomSetup } from "@/components/game/RoomSetup";
 import { Screen } from "@/components/ui/Screen";
 import { Wordmark } from "@/components/ui/Wordmark";
-import { deckLabels, levelLabels } from "@/data/roomOptions";
+import { deckLabels } from "@/data/roomOptions";
 import type { PlayerRow, RoomRow } from "@/types/room";
 
 interface LobbyScreenProps {
@@ -26,7 +26,7 @@ interface LobbyScreenProps {
   error: string | null;
   onStart: () => void;
   onLeave: () => void;
-  onSetup: (patch: { deck?: string; difficulty?: string; mode?: string }) => void;
+  onSetup: (patch: { deck?: string; mode?: string }) => void;
 }
 
 export function LobbyScreen({
@@ -198,8 +198,7 @@ export function LobbyScreen({
           </ul>
 
           <p className="mt-4 rounded-2xl border-2 border-ink bg-sun-light p-3 text-xs font-semibold text-ink/70">
-            {levelLabels[room.difficulty] ?? room.difficulty} · Baralho{" "}
-            {deckLabels[room.deck] ?? room.deck} · {cards(room.seed_cards)} de saída · Alvo{" "}
+            Baralho {deckLabels[room.deck] ?? room.deck} · {cards(room.seed_cards)} de saída · Alvo{" "}
             {room.target_cards}
           </p>
         </div>

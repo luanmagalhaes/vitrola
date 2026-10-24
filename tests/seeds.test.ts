@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { allTracks, nationalTracks } from "@/data/tracks";
-import { difficultyPresets, pickSpreadSeeds } from "@/lib/game/seeds";
+import { matchRules, pickSpreadSeeds } from "@/lib/game/seeds";
 import { createSeededRng } from "@/utils/shuffle";
 
 describe("sementes da mesa", () => {
@@ -61,27 +61,13 @@ describe("sementes da mesa", () => {
     expect(pickSpreadSeeds(tiny, 5, createSeededRng(1)).length).toBeLessThanOrEqual(2);
   });
 
-  it("mantem os modos coerentes entre si", () => {
-    expect(difficultyPresets.CLASSIC.seedCards).toBeLessThan(difficultyPresets.QUICK.seedCards);
-    expect(difficultyPresets.QUICK.seedCards).toBeLessThan(difficultyPresets.MARATHON.seedCards);
-    expect(difficultyPresets.MARATHON.targetCards).toBeGreaterThan(
-      difficultyPresets.CLASSIC.targetCards,
-    );
+  it("toda partida comeca com uma carta de saida so", () => {
+    expect(matchRules.seedCards).toBe(1);
+    expect(matchRules.targetCards).toBe(10);
   });
 
-  it("o classico e o mais fiel: uma carta de saida", () => {
-    expect(difficultyPresets.CLASSIC.seedCards).toBe(1);
-    expect(difficultyPresets.CLASSIC.targetCards).toBe(10);
-  });
-
-  it("o rapido encurta a partida em vez de dificultar", () => {
-    expect(difficultyPresets.QUICK.targetCards).toBeLessThan(
-      difficultyPresets.CLASSIC.targetCards,
-    );
-  });
-
-  it("cabe o pior caso: 10 jogadores na maratona", () => {
-    const needed = difficultyPresets.MARATHON.seedCards * 10;
+  it("cabe o pior caso: 10 jogadores", () => {
+    const needed = matchRules.seedCards * 10;
 
     expect(nationalTracks.length).toBeGreaterThan(needed);
     expect(allTracks.length).toBeGreaterThan(needed);

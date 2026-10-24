@@ -27,13 +27,9 @@ Primeiro a montar **10 músicas na ordem certa** ganha.
 
 Cada carta que entra vira uma âncora nova, então os intervalos multiplicam e encolhem: com 1 carta são 2 opções, com 9 cartas são 10. O jogo começa fácil e aperta sozinho.
 
-### 🎚️ Modos
+### 🎚️ Saída
 
-| Modo | Cartas de saída | Alvo | Para quem |
-| ---- | :-------------: | :--: | --------- |
-| **Clássico** | 1 | 10 | como no jogo de mesa |
-| **Rápido** | 3 | 8 | partida curta |
-| **Maratona** | 5 | 12 | jogo longo |
+Todo mundo começa com **1 carta de saída**, um ano só, e a linha do tempo cresce a partir dela. Alvo de 10 cartas.
 
 ### 🪙 As fichas
 
@@ -161,7 +157,7 @@ scripts/seed/           # catálogo curado, por baralho
 - [x] Linha do tempo jogável em dois passos
 - [x] Salas, turnos e multiplayer por polling
 - [x] Fichas por acertar artista e título, trocáveis por carta
-- [x] Três modos de jogo (clássico, rápido, maratona)
+- [x] Uma carta de saída por jogador
 - [x] Animação de vitória
 - [x] Voltar para a sala depois de sair
 - [x] Host tira jogador da mesa, com as cartas voltando ao monte

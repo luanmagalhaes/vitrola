@@ -1,6 +1,6 @@
 import { tracksForDeck, trackById } from "@/data/tracks";
 import { answerMatches, findPreview } from "@/lib/deezer";
-import { difficultyPresets, pickSpreadSeeds, type Difficulty } from "@/lib/game/seeds";
+import { matchRules, pickSpreadSeeds } from "@/lib/game/seeds";
 import { hostGraceSeconds } from "@/lib/game/limits";
 import { wipeChat } from "@/lib/game/chat";
 import { stealBlock, stealBlockMessage, windowFor, type GameMode } from "@/lib/game/steal";
@@ -254,7 +254,6 @@ async function seatFor(roomId: string) {
 export async function createRoom(input: {
   hostName: string;
   deck: DeckKind;
-  difficulty?: Difficulty;
   mode?: GameMode;
   isTest?: boolean;
 }) {
@@ -265,19 +264,16 @@ export async function createRoom(input: {
     throw new ServiceError(codeError.message, 500);
   }
 
-  const difficulty: Difficulty = input.difficulty ?? "CLASSIC";
-  const preset = difficultyPresets[difficulty];
-
   const { data: room, error: roomError } = await client
     .from("vt_rooms")
     .insert({
       code,
       deck: input.deck,
-      difficulty,
+      difficulty: "CLASSIC",
       mode: input.mode ?? "CLASSIC",
-      seed_cards: preset.seedCards,
-      target_cards: preset.targetCards,
-      token_cost: preset.tokenCost,
+      seed_cards: matchRules.seedCards,
+      target_cards: matchRules.targetCards,
+      token_cost: matchRules.tokenCost,
       is_test: input.isTest ?? false,
     })
     .select()
@@ -375,7 +371,6 @@ export async function updateSetup(input: {
   code: string;
   token: string;
   deck?: string;
-  difficulty?: string;
   mode?: string;
 }) {
   const client = serverClient();
@@ -403,19 +398,6 @@ export async function updateSetup(input: {
     }
 
     patch.deck = input.deck;
-  }
-
-  if (input.difficulty !== undefined) {
-    const preset = difficultyPresets[input.difficulty as Difficulty];
-
-    if (!preset) {
-      throw new ServiceError("Esse modo de jogo não existe", 422);
-    }
-
-    patch.difficulty = input.difficulty;
-    patch.seed_cards = preset.seedCards;
-    patch.target_cards = preset.targetCards;
-    patch.token_cost = preset.tokenCost;
   }
 
   if (input.mode !== undefined) {
@@ -474,7 +456,7 @@ export async function startMatch(input: { code: string; token: string }) {
   }
 
   const pool = tracksForDeck(room.deck);
-  const seedCount = room.seed_cards;
+  const seedCount = matchRules.seedCards;
   const used = new Set<string>();
   const rows: Array<{
     room_id: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { deckOptions, levelOptions, paceOptions } from "@/data/roomOptions";
+import { deckOptions, paceOptions } from "@/data/roomOptions";
 import type { RoomRow } from "@/types/room";
 
 interface RoomSetupProps {
@@ -8,7 +8,7 @@ interface RoomSetupProps {
   canEdit: boolean;
   busy: boolean;
   pending: string | null;
-  onChange: (patch: { deck?: string; difficulty?: string; mode?: string }) => void;
+  onChange: (patch: { deck?: string; mode?: string }) => void;
 }
 
 interface GroupProps {
@@ -85,17 +85,6 @@ export function RoomSetup({ room, canEdit, busy, pending, onChange }: RoomSetupP
         canEdit={canEdit}
         busy={busy}
         onPick={(deck) => onChange({ deck })}
-      />
-
-      <Group
-        title="Cartas de saída"
-        hint="Quantas você já recebe"
-        options={levelOptions}
-        chosen={room.difficulty}
-        tone="bg-magenta text-cream"
-        canEdit={canEdit}
-        busy={busy}
-        onPick={(difficulty) => onChange({ difficulty })}
       />
 
       <Group

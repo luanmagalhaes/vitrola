@@ -6,7 +6,6 @@ export async function POST(request: Request, context: { params: Promise<{ code: 
     const { code } = await context.params;
     const body = (await request.json()) as {
       deck?: string;
-      difficulty?: string;
       mode?: string;
     };
 
@@ -14,7 +13,6 @@ export async function POST(request: Request, context: { params: Promise<{ code: 
       code,
       token: playerToken(request),
       deck: body.deck,
-      difficulty: body.difficulty,
       mode: body.mode,
     });
   });

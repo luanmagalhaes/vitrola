@@ -32,30 +32,6 @@ export const deckOptions: Array<RoomOption<DeckKind> & { tone: string }> = [
   },
 ];
 
-export const levelOptions: Array<RoomOption<string> & { standard: boolean }> = [
-  {
-    key: "CLASSIC",
-    head: "1 carta",
-    label: "Clássico",
-    hint: "Alvo 10 · Aperta sozinho",
-    standard: true,
-  },
-  {
-    key: "QUICK",
-    head: "3 cartas",
-    label: "Rápido",
-    hint: "Alvo 8 · Já começa apertado",
-    standard: false,
-  },
-  {
-    key: "MARATHON",
-    head: "5 cartas",
-    label: "Maratona",
-    hint: "Alvo 12 · O mais difícil",
-    standard: false,
-  },
-];
-
 export const paceOptions: Array<RoomOption<"CLASSIC" | "LIGHTNING">> = [
   {
     key: "CLASSIC",
@@ -75,10 +51,4 @@ export const deckLabels: Record<string, string> = {
   NATIONAL: copy.decks.national,
   INTERNATIONAL: copy.decks.international,
   MIXED: copy.decks.mixed,
-};
-
-export const levelLabels: Record<string, string> = {
-  CLASSIC: "Clássico",
-  QUICK: "Rápido",
-  MARATHON: "Maratona",
 };

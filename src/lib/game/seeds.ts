@@ -72,10 +72,4 @@ export function pickSpreadSeeds(
   return chosen.slice(0, count).sort((a, b) => a.year - b.year);
 }
 
-export const difficultyPresets = {
-  CLASSIC: { seedCards: 1, targetCards: 10, tokenCost: 5 },
-  QUICK: { seedCards: 3, targetCards: 8, tokenCost: 5 },
-  MARATHON: { seedCards: 5, targetCards: 12, tokenCost: 6 },
-} as const;
-
-export type Difficulty = keyof typeof difficultyPresets;
+export const matchRules = { seedCards: 1, targetCards: 10, tokenCost: 5 } as const;

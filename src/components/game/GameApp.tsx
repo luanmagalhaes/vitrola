@@ -313,7 +313,7 @@ export function GameApp() {
 
                 const result =
                   view === "CREATE"
-                    ? await api.createRoom(input.name, "MIXED", "CLASSIC", "CLASSIC")
+                    ? await api.createRoom(input.name, "MIXED", "CLASSIC")
                     : await api.joinRoom(input.code, input.name);
 
                 save(result);
