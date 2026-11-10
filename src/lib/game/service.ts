@@ -17,6 +17,7 @@ import { shuffle } from "@/utils/shuffle";
 import { capitalize } from "@/utils/text";
 import { DeckKind } from "@/types/track";
 import { RoomPhase, type PlayerRow, type RoomRow } from "@/types/room";
+import type { MatchEnding } from "@/types/history";
 
 export class ServiceError extends Error {
   readonly status: number;
@@ -1371,6 +1372,7 @@ export async function saveMatch(
   roomId: string,
   roomCode: string,
   winnerId: string | null,
+  closedBy: MatchEnding = "target",
 ): Promise<void> {
   const client = serverClient();
   const { data: roomRow } = await client
@@ -1397,6 +1399,7 @@ export async function saveMatch(
 
   await client.from("vt_matches").insert({
     room_code: roomCode,
+    closed_by: closedBy,
     winner_name: people.find((person) => person.id === winnerId)?.name ?? null,
     rounds: people.reduce((total, person) => total + person.timeline_count, 0),
     players: people.map((person) => ({
@@ -1404,4 +1407,49 @@ export async function saveMatch(
       score: person.timeline_count,
     })),
   });
+}
+
+export const staleMatchHours = 5;
+
+export async function closeStaleMatches(): Promise<string[]> {
+  const client = serverClient();
+  const deadline = new Date(Date.now() - staleMatchHours * 60 * 60 * 1000).toISOString();
+  const { data } = await client
+    .from("vt_rooms")
+    .select("id, code, started_at")
+    .eq("phase", RoomPhase.Playing)
+    .lt("started_at", deadline);
+
+  const stale = (data ?? []) as Array<{ id: string; code: string; started_at: string | null }>;
+  const closed: string[] = [];
+
+  for (const room of stale) {
+    const { data: people } = await client
+      .from("vt_players")
+      .select("id")
+      .eq("room_id", room.id)
+      .order("timeline_count", { ascending: false })
+      .limit(1);
+
+    const leader = ((people ?? []) as Array<{ id: string }>)[0] ?? null;
+    const { data: done } = await client
+      .from("vt_rooms")
+      .update({
+        phase: RoomPhase.Finished,
+        winner_player_id: leader?.id ?? null,
+        finished_at: new Date().toISOString(),
+      })
+      .eq("id", room.id)
+      .eq("phase", RoomPhase.Playing)
+      .select("id");
+
+    if (((done ?? []) as unknown[]).length === 0) {
+      continue;
+    }
+
+    await saveMatch(room.id, room.code, leader?.id ?? null, "timeout");
+    closed.push(room.code);
+  }
+
+  return closed;
 }
