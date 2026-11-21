@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { MyPhoto } from "@/components/game/MyPhoto";
 import { TimelineBoard } from "@/components/game/TimelineBoard";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
@@ -16,6 +17,9 @@ interface TableScreenProps {
   events: EventRow[];
   remaining: number;
   myId: string | null;
+  code: string;
+  token: string;
+  onRefresh: () => void;
   busy: boolean;
   error: string | null;
   turnStartedAt: string | null;
@@ -65,6 +69,9 @@ export function TableScreen({
   events,
   remaining,
   myId,
+  code,
+  token,
+  onRefresh,
   busy,
   error,
   turnStartedAt,
@@ -157,6 +164,17 @@ export function TableScreen({
           ← Sair
         </button>
         <div className="flex items-center gap-2">
+          {me ? (
+            <MyPhoto
+              code={code}
+              token={token}
+              name={me.name}
+              photo={me.avatar}
+              emoji={me.emoji}
+              size="sm"
+              onChanged={onRefresh}
+            />
+          ) : null}
           {room.mode === "LIGHTNING" ? (
             <span
               className="display rounded-full border-2 border-ink bg-grape px-3 py-1 text-xs text-cream"

@@ -464,6 +464,9 @@ export function GameApp() {
         events={state.events}
         remaining={state.remaining}
         myId={state.meId}
+        code={session.code}
+        token={session.accessToken}
+        onRefresh={() => void refresh()}
         busy={busy}
         error={error}
         turnStartedAt={turnStartedAt}

@@ -175,3 +175,36 @@ button:disabled {
   animation: pop-in 320ms var(--ease-swing) both;
   will-change: transform, opacity;
 }
+
+@utility photo-veil {
+  background: color-mix(in srgb, var(--color-ink) 74%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(118%);
+  backdrop-filter: blur(10px) saturate(118%);
+}
+
+@keyframes veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes photo-pop {
+  from { transform: translate3d(0, 14px, 0) scale(0.92); opacity: 0; }
+  to { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+}
+
+@utility animate-veil-in {
+  animation: veil-in 200ms ease-out both;
+  will-change: opacity;
+}
+
+@utility animate-photo-pop {
+  animation: photo-pop 300ms var(--ease-swing) both;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-veil-in,
+  .animate-photo-pop {
+    animation: none;
+  }
+}

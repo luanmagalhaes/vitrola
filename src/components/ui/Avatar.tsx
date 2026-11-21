@@ -1,17 +1,19 @@
 import { initialsFor } from "@/lib/photo";
 
-type Size = "sm" | "md" | "lg";
+type Size = "sm" | "md" | "lg" | "xl";
 
 const boxes: Record<Size, string> = {
   sm: "h-8 w-8 text-[0.6rem]",
   md: "h-12 w-12 text-sm",
   lg: "h-20 w-20 text-xl",
+  xl: "h-28 w-28 text-3xl",
 };
 
 const glyphs: Record<Size, string> = {
   sm: "text-base",
   md: "text-2xl",
   lg: "text-4xl",
+  xl: "text-6xl",
 };
 
 export function Avatar({

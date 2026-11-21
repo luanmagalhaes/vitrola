@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { PhotoCropper } from "@/components/ui/PhotoCropper";
-import { ZoomablePhoto } from "@/components/ui/ZoomablePhoto";
+import { useState } from "react";
+import { MyPhoto } from "@/components/game/MyPhoto";
 import { faces } from "@/data/faces";
 import { api } from "@/lib/api";
 import type { PlayerRow } from "@/types/room";
@@ -20,10 +19,8 @@ export function AvatarPicker({
 }) {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
-  const [cropping, setCropping] = useState<File | null>(null);
-  const file = useRef<HTMLInputElement>(null);
 
-  const run = async (action: () => Promise<unknown>) => {
+  const chooseFace = async (face: string) => {
     if (busy) {
       return;
     }
@@ -32,10 +29,10 @@ export function AvatarPicker({
     setProblem(null);
 
     try {
-      await action();
+      await api.setEmoji(code, token, face);
       onDone();
     } catch (cause) {
-      setProblem(cause instanceof Error ? cause.message : "Não consegui trocar.");
+      setProblem(cause instanceof Error ? cause.message : "Não consegui trocar o bichinho.");
     } finally {
       setBusy(false);
     }
@@ -43,24 +40,21 @@ export function AvatarPicker({
 
   return (
     <div className="rounded-2xl border-2 border-ink bg-paper p-3">
-      {cropping ? (
-        <PhotoCropper
-          file={cropping}
-          busy={busy}
-          onCancel={() => setCropping(null)}
-          onDone={(photo) => {
-            setCropping(null);
-            void run(() => api.setPhoto(code, token, photo));
-          }}
-        />
-      ) : null}
-
       <div className="flex items-center gap-3">
-        <ZoomablePhoto name={me.name} photo={me.avatar} emoji={me.emoji} size="lg" />
+        <MyPhoto
+          code={code}
+          token={token}
+          name={me.name}
+          photo={me.avatar}
+          emoji={me.emoji}
+          size="lg"
+          action
+          onChanged={onDone}
+        />
         <div className="min-w-0 flex-1">
           <p className="display text-ink">Sua cara</p>
           <p className="text-xs font-semibold text-ink/60">
-            Escolha um bichinho ou mande uma foto sua.
+            Toque na sua cara para mandar uma foto, ou escolha um bichinho aqui embaixo.
           </p>
         </div>
       </div>
@@ -73,9 +67,9 @@ export function AvatarPicker({
             disabled={busy}
             aria-label={`Usar ${face}`}
             aria-pressed={me.emoji === face}
-            onClick={() => void run(() => api.setEmoji(code, token, face))}
+            onClick={() => void chooseFace(face)}
             className={`cursor-pointer rounded-lg border-2 py-1 text-xl disabled:opacity-50 ${
-              me.emoji === face ? "border-ink bg-gold" : "border-transparent bg-cream"
+              me.emoji === face ? "border-ink bg-sun" : "border-transparent bg-cream"
             }`}
           >
             {face}
@@ -83,36 +77,11 @@ export function AvatarPicker({
         ))}
       </div>
 
-      <input
-        ref={file}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="hidden"
-        onChange={(event) => {
-          const picked = event.target.files?.[0];
-
-          event.target.value = "";
-
-          if (!picked) {
-            return;
-          }
-
-          setProblem(null);
-          setCropping(picked);
-        }}
-      />
-
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => file.current?.click()}
-        className="display mt-2 w-full cursor-pointer rounded-xl border-2 border-ink bg-gold py-2 text-xs text-ink disabled:opacity-50"
-      >
-        {busy ? "Um instante" : "Usar minha foto"}
-      </button>
-
       {problem ? (
-        <p className="mt-2 rounded-lg bg-magenta px-2 py-1 text-center text-[0.7rem] font-semibold text-cream">
+        <p
+          role="alert"
+          className="mt-2 rounded-lg bg-magenta px-2 py-1 text-center text-[0.7rem] font-semibold text-cream"
+        >
           {problem}
         </p>
       ) : null}
